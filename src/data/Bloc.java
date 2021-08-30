@@ -1,9 +1,5 @@
 package data;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public abstract class Bloc extends AbstractTeachingUnit implements BlocInterface, TeachingUnit {
     private final String blocName;
@@ -124,18 +120,7 @@ public abstract class Bloc extends AbstractTeachingUnit implements BlocInterface
         double meanOfDiffs = acc / listNote.size();
         return Math.sqrt(meanOfDiffs);
     }
-    @Override
-    public boolean equals(Object obj) {
-        boolean areEqual = false;
-        if (obj instanceof Bloc bloc){
-            areEqual = blocID.equals(bloc.blocID) && blocName.equals(bloc.blocName);
-        }
-        return areEqual;
-    }
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), blocName, blocID);
-    }
+
 
     @Override
     public String toString() {

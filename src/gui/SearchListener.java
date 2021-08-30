@@ -1,9 +1,12 @@
-package gui;
+/*package gui;
+
+import gui.Table;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import javax.swing.text.Document;
 
 public abstract class SearchListener implements DocumentListener {
@@ -33,3 +36,4 @@ public abstract class SearchListener implements DocumentListener {
 
 
 }
+*/

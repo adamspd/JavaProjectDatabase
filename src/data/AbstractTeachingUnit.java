@@ -31,9 +31,8 @@ public abstract class AbstractTeachingUnit implements TeachingUnit {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof AbstractTeachingUnit teachingUnit)) return false;
-        return getName().equals(teachingUnit.getName()) && getID().equals(teachingUnit.getID());
+        AbstractTeachingUnit that = (AbstractTeachingUnit) obj;
+        return ID.equals(that.ID);
     }
 
     @Override

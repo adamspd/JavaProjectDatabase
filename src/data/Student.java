@@ -1,5 +1,6 @@
 package data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,18 +19,6 @@ public class Student  {
         this.notesMap = new HashMap<>();
     }
 
-    public boolean equals(Object obj){
-        boolean areEqual = false;
-        if (obj instanceof Student student) {
-            areEqual = identifier.equals(student.identifier);
-        }
-        return areEqual;
-    }
-
-    @Override
-    public int hashCode() {
-        return identifier.hashCode();
-    }
 
     public double moyenne() {
         double res = 0;
@@ -60,19 +49,6 @@ public class Student  {
     public String getProgramID() {
         return program.getProgramID();
     }
-
-   /* public void setProgram(Program newProgram) {
-        program = newProgram;
-    }
-
-   /* public Program ajouterProgram(Program newProgram){
-        for (Program program : programArrayList){
-            if (!program.equals(newProgram)){
-                programArrayList.add(newProgram);
-            }
-        }
-        return newProgram;
-    }*/
 
     public String getIdentifier() {
         return identifier;

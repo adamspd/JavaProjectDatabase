@@ -6,11 +6,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,20 +25,17 @@ public class XMLReader {
     private final HashMap<String, Program> mapProgram;
     private final HashMap<String, Bloc> mapBlocs;
 
-    public XMLReader() {
+    public XMLReader(String path) {
         this.mapStudent = new HashMap<>();
         this.mapCourse = new HashMap<>();
         this.mapProgram = new HashMap<>();
         this.mapBlocs = new HashMap<>();
-        initMap();
+        initMap(path);
     }
 
-    public void initMap() {
+    public void initMap(String path) {
         try {
-            File dir = new File("C:\\Users\\Adams Pierre David\\IdeaProjects\\Java2020Projet\\src");
-            dir.mkdirs();
-            File file = new File (dir, "data.xml");
-           // File file = new File("/Users/ibra-kane/Desktop/L3/S5/Programmation & Conception en Java/Java2020Projet/src/data.xml");
+            File file = new File (path);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(file);; // ouverture et lecture du fichier XML
@@ -98,7 +98,7 @@ public class XMLReader {
                     String noteString = gradeElement.getElementsByTagName("value").item(0).getTextContent();
                     double note = - 1;
                     if (!noteString.equals("ABI")) {
-                        note = Double.parseDouble(noteString);
+                        note = (Double) Double.parseDouble(noteString);
                     }
                     student.getNotesMap().put(matiere, note);
                 }

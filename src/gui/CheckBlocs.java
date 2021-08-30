@@ -4,13 +4,12 @@ import data.Bloc;
 import data.Program;
 import data.Student;
 import data.StudentComparator;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 
 public class CheckBlocs extends JFrame implements ActionListener {
@@ -36,17 +35,17 @@ public class CheckBlocs extends JFrame implements ActionListener {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.anchor = GridBagConstraints.WEST;
-        // theses panel Button not seen in the right Layout
+
         JPanel panelButton = new JPanel((new FlowLayout(FlowLayout.RIGHT)));
         cancelButton = new JButton("CANCEL");
         okButton = new JButton("OK");
-        okButton.addActionListener(this);
         cancelButton.addActionListener(this);
+        okButton.addActionListener(this);
 
-        panelButton.add(okButton, RIGHT_ALIGNMENT);
         panelButton.add(cancelButton, RIGHT_ALIGNMENT);
+        panelButton.add(okButton, RIGHT_ALIGNMENT);
 
-        if (checkBoxNumber == 0) {
+        if (checkBoxNumber == 0 || checkBoxNumber == 3) {
             initCheckBlocs(gbc);
         }
         if (checkBoxNumber == 1) {
@@ -81,6 +80,7 @@ public class CheckBlocs extends JFrame implements ActionListener {
                 if (checkBoxNumber == 0) {table.checkBoxBlocs(selectedBox);}
                 if (checkBoxNumber == 1) {table.checkBoxProgram(selectedBox); }
                 if (checkBoxNumber == 2) {table.checkBoxStudent(selectedBox);}
+                if (checkBoxNumber == 3) {table.addProgram(selectedBox);}
             }
             this.dispose();
         }
@@ -100,7 +100,7 @@ public class CheckBlocs extends JFrame implements ActionListener {
     }
 
     public JCheckBox createCheckBox(Student student) {
-        String  text = student.getName().toUpperCase() + " - " + student.getSurname() + " - " + student.getIdentifier();
+        String  text = student.getSurname().toUpperCase() + " - " + student.getName() + " - " + student.getIdentifier();
         return createCheckBox(student.getIdentifier(), text);
     }
 
@@ -129,7 +129,7 @@ public class CheckBlocs extends JFrame implements ActionListener {
 
     public void initCheckStudent(GridBagConstraints gbc) {
         List<Student> listStudent = new ArrayList<Student>(table.getXmlReader().getMapStudent().values());
-        Comparator<Student> comparator = StudentComparator.sortName(true);
+        Comparator<Student> comparator = StudentComparator.sortSurname(true);
         listStudent.sort(comparator);
         for (Student student : listStudent) {
             checkBoxPanel.add(createCheckBox(student), gbc);

@@ -1,30 +1,30 @@
 package gui;
 
 import data.*;
-
 import javax.swing.*;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
 
 public class Table extends JFrame {
     private final JTable table;
     private String[][] data;
     private String[] columnNames;
-    private final XMLReader xmlReader = new XMLReader();
+    private XMLReader xmlReader = new XMLReader("src/data.xml");
     private List<Program> programList = new ArrayList<>();
     private final DefaultTableModel tableModel = new DefaultTableModel();
     private List<TeachingUnit> listTeachingUnit;
-    private final List<Student> listStudentFull =  new ArrayList<>(xmlReader.getMapStudent().values());
+    private List<Student> listStudentFull =  new ArrayList<>(xmlReader.getMapStudent().values());
     private List<Student> listStudentParameter = new ArrayList<>();
     private Boolean isDisplayStudent = true;
+    private Program nouveauProgram;
     private Boolean isProgram = true;
+    private Comparator<Student> comparator = StudentComparator.sortSurname(true);
     int lastUpdate;
+    Data dataClass = new Data(this);
 
     public Table() {
         setLayout(new BorderLayout());
@@ -46,7 +46,7 @@ public class Table extends JFrame {
         Table gui = new Table();
         BarMenu menu = new BarMenu(gui);
         gui.setJMenuBar(menu.createMenu());
-        gui.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        gui.setDefaultCloseOperation(EXIT_ON_CLOSE);
         gui.setSize(1000,500);
         gui.setLocationRelativeTo(null);
         gui.setTitle("Université Côte d'Azur");
@@ -87,30 +87,29 @@ public class Table extends JFrame {
         for(String blocID : listBlocID) {
             setBlocList.add(xmlReader.getMapBlocs().get(blocID));
         }
-        listTeachingUnit = Data.BlocToList(setBlocList);
+        listTeachingUnit = dataClass.BlocToList(setBlocList);
         updateTableModelBlocs();
     }
 
     public void update() {
-        Comparator<Student> comparator = StudentComparator.sortName(true);
-        data = Data.initData(listTeachingUnit, listStudentParameter, comparator, isProgram, isDisplayStudent, programList);
-        columnNames = Data.initColumnName(programList, listTeachingUnit, isDisplayStudent);
+        data = dataClass.initData(listTeachingUnit, listStudentParameter, comparator, isProgram, isDisplayStudent, programList);
+        columnNames = dataClass.initColumnName(programList, listTeachingUnit, isDisplayStudent);
         tableModel.setDataVector(data, columnNames);
     }
 
     public void updateTableModelBlocs() {
         programList = new ArrayList<>();
         listStudentParameter = new ArrayList<>();
-        listStudentParameter = Data.initListStudentsBlocs(listStudentFull, listTeachingUnit);
+        listStudentParameter = dataClass.initListStudentsBlocs(listStudentFull, listTeachingUnit);
         isProgram = false;
         lastUpdate = 0;
         update();
+
     }
 
     public void updateTableModelProgram() {
-        listTeachingUnit = Data.programToBlocs(programList);
-        System.out.println(listStudentParameter);
-        listStudentParameter = Data.initListStudents(listStudentFull, programList);
+        listTeachingUnit = dataClass.programToBlocs(programList);
+        listStudentParameter = dataClass.initListStudents(listStudentFull, programList);
         System.out.println(listStudentParameter);
         isProgram = true;
         lastUpdate = 1;
@@ -118,7 +117,7 @@ public class Table extends JFrame {
     }
 
     public void updateTableModelStudent() {
-        listTeachingUnit = Data.initCoursStudent(listStudentParameter);
+        listTeachingUnit = dataClass.initCoursStudent(listStudentParameter);
         isProgram = true;
         lastUpdate = 2;
         update();
@@ -156,51 +155,53 @@ public class Table extends JFrame {
         }
         return tree;
     }
-    /*Cette fonction permet d'ajouter un étudiant de la liste des étudiants*/
 
+    /*Cette fonction permet d'ajouter un étudiant de la liste des étudiants*/
     public void addStudent(Student student) {
         xmlReader.getMapStudent().put(student.getIdentifier(), student);
         xmlReader.getMapStudent().get(student.getIdentifier()).getNotesMap().put("SLUIN501", 15.0);
         listStudentParameter.add(student);
-       update();
+        update();
     }
 
     /*Cette fonction permet de supprimer de la classe student un étudiant de la liste*/
-
-   /* public void deleteStudent(Student student){
-        xmlReader.getMapStudent().put(student.getIdentifier(),student);
-        xmlReader.getMapStudent().get(student.getIdentifier()).getNotesMap().get(student);
-        listStudentParameter.remove(student);
-        update();
-    }*/
-
     public void deleteStudent(String identifier){
         Student student = xmlReader.getMapStudent().get(identifier);
-        if (student !=  null){
-            String.format("L'étudiant %s de n°INE :%s sera supprimé de la liste ",student.getName(), student.getIdentifier());
-            xmlReader.getMapStudent().remove(student);
-            listStudentParameter.remove(student);
-        }else {
-            JOptionPane.showMessageDialog(this,"Aucun étudiant réfèrencé à cet identifiant !","Numéro étudiant INCORRECT"
-                    ,JOptionPane.ERROR_MESSAGE);
-        }
-        xmlReader.getMapStudent().remove(student);
+        xmlReader.getMapStudent().remove(identifier);
         listStudentParameter.remove(student);
         update();
     }
 
-    /*public void deleteStudent(String identifier){
-        Student student = xmlReader.getMapStudent().get(identifier);
-        if (student != null) {
-            //System.out.println(student);
-            xmlReader.getMapStudent().remove(student);
-            listStudentParameter.remove(student);
-            update();
-        } else {
-            JOptionPane.showMessageDialog(this, "Je n'ai pas ce numéro d'étudiant dans ma base !",
-                    "Numéro étudiant INCORRECT !!! ", JOptionPane.ERROR_MESSAGE);
+    public void addNote(String studentID, String courseID, String note){
+        Student student = xmlReader.getMapStudent().get(studentID);
+        student.getNotesMap().put(courseID, Double.valueOf(note));
+        update();
+    }
+
+    public void removeNote(String studentID, String courseID){
+        Student student = xmlReader.getMapStudent().get(studentID);
+        student.getNotesMap().remove(courseID);
+        update();
+    }
+
+    public void addProgram(List<String> listBlocID) {
+        for(String blocID : listBlocID) {
+            nouveauProgram.addBloc(xmlReader.getMapBlocs().get(blocID));
         }
-    }*/
+        xmlReader.getMapProgram().put(nouveauProgram.getProgramID(), nouveauProgram);
+    }
+
+    public void setComparator(Comparator<Student> comparator) {
+        this.comparator = comparator;
+        buttonClickDisplay();
+    }
+
+    public void addCourse(Course course) {
+        xmlReader.getMapCourse().put(course.getID(),course);
+        BlocSimple blocsimple = new BlocSimple(course.getName(), course.getID());
+        blocsimple.addCourses(course);
+        xmlReader.getMapBlocs().put(blocsimple.getID(), blocsimple);
+    }
 
     public String[][] getData() {
         return data;
@@ -220,5 +221,17 @@ public class Table extends JFrame {
 
     public Boolean getDisplayStudent() {
         return isDisplayStudent;
+    }
+
+    public void setXmlReader(XMLReader xmlReader) {
+        this.xmlReader = xmlReader;
+    }
+
+    public void setNouveauProgram(Program nouveauProgram) {
+        this.nouveauProgram = nouveauProgram;
+    }
+
+    public void setListStudentFull(List<Student> listStudentFull) {
+        this.listStudentFull = listStudentFull;
     }
 }
